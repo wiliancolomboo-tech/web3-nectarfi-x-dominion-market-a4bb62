@@ -1,0 +1,19 @@
++---------------------------------------------------------------------------------------+
+|                                SECURITY DEFENSE IN DEPTH                              |
++---------------------------------------------------------------------------------------+
+| 1. Reentrancy Protection:                                                            |
+|    - Anchor CEI (Checks-Effects-Interactions) strictly enforced across all transfers. |
+|    - Vault state updated before any token transfer or CPI invocation.                 |
++---------------------------------------------------------------------------------------+
+| 2. PDA Canonical Seed Verification:                                                   |
+|    - Seeds: [b"vault", dominion_market.key()] enforces unique mapping per market.     |
+|    - Bumps saved to state during initialization to eliminate runtime find_address.    |
++---------------------------------------------------------------------------------------+
+| 3. Mathematical Invariants:                                                          |
+|    - u128 casting on all BPS multiplication before division prevents truncation loss. |
+|    - Enforced Junior buffer: Senior deposits fail if buffer falls below minimum BPS. |
++---------------------------------------------------------------------------------------+
+| 4. Access Control & Authorization:                                                   |
+|    - `has_one = authority` constraint on critical parameters.                         |
+|    - Maturity settlement guarded by sysvar clock timestamp assertions.                |
++---------------------------------------------------------------------------------------+

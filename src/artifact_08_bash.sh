@@ -1,0 +1,1 @@
+solana address -k target/deploy/nectar_dominion-keypair.json

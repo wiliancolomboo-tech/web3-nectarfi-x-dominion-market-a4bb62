@@ -1,0 +1,10 @@
+NectarFi x Dominion Market: Tranche & Settlement Tests
+    ✔ 1. Initializes Vault linked to Dominion Market Note (390ms)
+    ✔ 2. Prevents Senior deposit without required Junior first-loss protection buffer (42ms)
+    ✔ 3. Successfully deposits Junior first-loss tranche capital (180ms)
+    ✔ 4. Accepts Senior deposits once safety buffer is established (172ms)
+    ✔ 5. Settles vault post-maturity and enforces senior priority waterfall (5110ms)
+    ✔ 6. Senior redeems full principal + fixed guaranteed yield (190ms)
+    ✔ 7. Junior redeems residual alpha profit pool (185ms)
+
+  7 passing (6.3s)
