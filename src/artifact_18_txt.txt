@@ -1,0 +1,10 @@
+nectar_dominion_market QA & Validation Matrix
+    ✔ 1. Successfully initializes a Nectar-backed conditional market (418ms)
+    ✔ 2. Deposits Nectar collateral and mints complementary YES/NO tokens (360ms)
+    ✔ 3. Merges paired outcome tokens to unlock principal prior to resolution (315ms)
+    ✔ 4. Rejects early resolution before the settlement timestamp (185ms)
+    ✔ 5. Resolves market accurately after timestamp and simulates yield streaming (4250ms)
+    ✔ 6. Prevents burning non-winning Outcome B tokens (202ms)
+    ✔ 7. Settles winning Outcome A tokens with 100% principal + accrued yield bonus (340ms)
+
+  7 passing (6.1s)

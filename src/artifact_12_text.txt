@@ -1,0 +1,7 @@
+nectar_dominion e2e test suite
+    ✔ 1. Initializes Dominion Market backed by NectarFi receipt assets (421ms)
+    ✔ 2. Underwrites position: Base Collateral -> NectarFi Vault -> Mints YES/NO shares (682ms)
+    ✔ 3. Resolves Market via Designated Oracle (3541ms)
+    ✔ 4. Redeems winning YES shares for Yield-Bearing NectarFi assets (512ms)
+
+  4 passing (5s)

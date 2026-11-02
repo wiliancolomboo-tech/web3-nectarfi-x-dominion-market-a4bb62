@@ -1,0 +1,11 @@
+nectar-dominion-engine-matrix
+    ✔ QA-01: Successfully Initializes Dominion Market with NectarFi Escrow (412ms)
+    ✔ QA-02: Alice Enters Position [Outcome 0 - Bullish] and Routes to Nectar Vault (289ms)
+    ✔ QA-03: Bob Enters Opposing Position [Outcome 1 - Bearish] (274ms)
+    ✔ QA-04: Fails when attempting settlement prior to resolution timestamp (105ms)
+    ✔ QA-05: Resolves Market with Outcome 0 as Winning Side (3612ms)
+    ✔ QA-06: Loser Bob is Rejected from Claiming Payout (118ms)
+    ✔ QA-07: Winner Alice Claims Total Principal + Accrued NectarFi Yield Bonus (320ms)
+    ✔ QA-08: Reentrancy / Double-Claim Defense Reverts on Second Claim Attempt (102ms)
+
+  8 passing (5.2s)

@@ -1,0 +1,10 @@
+nectar_dominion integration test matrix
+    ✔ 1. Initializes the NectarFi Structured Yield Vault (214ms)
+    ✔ 2. User deposits principal with 100% preservation isolation (189ms)
+    ✔ 3. Initializes a Dominion Market tranche risk venue (178ms)
+    ✔ 4. Invariant Guard: Keeper crank rejects if yield does not exceed staked principal (85ms)
+    ✔ 5. Yield Accrual & Keeper Crank: Routes yield to Dominion without impairing principal (294ms)
+    ✔ 6. Settle Dominion Market as Won and route amplified returns to vault (5210ms)
+    ✔ 7. User withdraws full initial principal + asymmetric Dominion upside dividend (222ms)
+
+  7 passing (6.4s)

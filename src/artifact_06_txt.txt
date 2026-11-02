@@ -1,0 +1,10 @@
++------------------------------------+---------------+-------------------+---------------------+
+| Instruction                        | Default Limit | Consumed CUs (Avg)| Optimization Method |
++------------------------------------+---------------+-------------------+---------------------+
+| initialize_vault                   | 200,000       | 42,150            | Boxed Structs       |
+| deposit_senior                     | 200,000       | 28,400            | Single-Pass Math    |
+| deposit_junior                     | 200,000       | 28,400            | Inlined CPI Token   |
+| deploy_to_dominion                 | 200,000       | 34,200            | Direct Signer Seeds |
+| settle_epoch_waterfall             | 200,000       | 21,900            | u128 Bitwise Calc   |
+| redeem_senior                      | 200,000       | 36,100            | Direct Burn & Mint  |
++------------------------------------+---------------+-------------------+---------------------+

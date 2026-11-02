@@ -1,42 +1,46 @@
 flowchart TD
-    subgraph Depositors["Depositor Layer"]
-        UserSenior["Senior Depositor (Capital Preservation)"]
-        UserJunior["Junior Depositor (Yield Maximization / First Loss)"]
+    subgraph Clients ["Client & Keeper Layer"]
+        User["User / Trader"]
+        Liquidator["Liquidator / Searcher"]
+        Keeper["Crank Keeper / Rebalancer"]
+        Oracle["Pyth / Switchboard Oracle Feed"]
     end
 
-    subgraph NectarCore["NectarFi Tranche Engine (Anchor Program)"]
-        VaultState["Tranche Vault State PDA<br/>[seeds = ['vault', market_id]]"]
-        SeniorToken["Senior Tranche Receipt Mint (secNCTR)"]
-        JuniorToken["Junior Tranche Receipt Mint (jnrNCTR)"]
-        UnderlyingVault["Underlying SPL Reserve Vault PDA<br/>[seeds = ['vault_reserve', vault_key]]"]
-        WaterfallEngine["Risk & Waterfall Accounting Engine<br/>Fixed APY vs. Excess Carry"]
+    subgraph DominionClearinghouse ["Dominion Market Program (Anchor)"]
+        MarketConfig["PDA: Market Config<br/>(LTV, Liquidation Penalty, Admin)"]
+        UserMarginAccount["PDA: User Margin Account<br/>(Collateral Shares, Borrowed Debt, Health)"]
+        VaultCollateralATA["PDA: Dominion Vault ATA<br/>(nectarTokens Held)"]
+        DebtTokenATA["PDA: Dominion Debt Reserve ATA<br/>(USDC Liquidity Pool)"]
+
+        subgraph Engine ["Risk & Execution Engine"]
+            HealthCheck{"Health Factor Check<br/>HF >= 1.0?"}
+            PricingEngine["Pricing & Exchange Rate Engine<br/>ECV = Shares * Rate * PythPrice"]
+            LiqEngine["Atomic Liquidation Pipeline"]
+        end
     end
 
-    subgraph DominionMarket["Dominion Market Ecosystem"]
-        DominionProgram["Dominion Debt Engine"]
-        DebtMarketState["Dominion Market PDA<br/>Fixed Maturity / Strike / Haircut"]
-        BorrowerCollateral["Collateral Custody Account<br/>(SOL / LST / Real-World Asset)"]
-        DominionNoteMint["Dominion Note Mint (Maturity NFT / SPL-Debt)"]
-        DominionEscrow["Dominion Settlement Escrow PDA"]
+    subgraph NectarFiVault ["NectarFi Vault Program"]
+        NectarVaultState["PDA: Nectar Vault Controller<br/>(Total Assets, Total Shares, Yield Rate)"]
+        NectarUnderlyingVault["Underlying Reserve ATA<br/>(USDC / SOL / JitoSOL)"]
+        NectarMint["Nectar Share Mint<br/>(nectarUSDC / nectarSOL)"]
     end
 
-    subgraph KeeperNetwork["Autonomous Execution Layer"]
-        KeeperBot["Permissionless Keeper Bot / Crank Worker"]
-        OracleFeeds["Pyth / Switchboard Price Feed"]
-    end
+    %% Interactions
+    User -->|"1. Deposit & Lock nectarToken"| VaultCollateralATA
+    User -->|"2. Update Account State"| UserMarginAccount
+    UserMarginAccount --> PricingEngine
+    PricingEngine -->|"Read Pyth Price"| Oracle
+    PricingEngine -->|"Read Share-to-Asset Rate"| NectarVaultState
 
-    UserSenior -->|"Deposit USDC (Priority Return)"| NectarCore
-    UserJunior -->|"Deposit USDC (First-Loss Capital)"| NectarCore
-    NectarCore -->|"Mint secNCTR"| UserSenior
-    NectarCore -->|"Mint jnrNCTR"| UserJunior
+    User -->|"3. Borrow Margin Asset (USDC)"| DebtTokenATA
+    DebtTokenATA -->|"Transfer Debt Asset"| User
+    Engine --> HealthCheck
 
-    NectarCore -->|"CPI: Subscribe to Dominion Note / Fund Loan"| DominionMarket
-    DominionMarket -->|"Deposit Collateral (LST / SOL)"| BorrowerCollateral
-    DominionMarket -->|"Issue Debt Note SPL"| NectarCore
+    Liquidator -->|"4. Trigger Liquidation if HF < 1.0"| LiqEngine
+    LiqEngine -->|"Seize nectarTokens"| VaultCollateralATA
+    LiqEngine -->|"Repay Bad Debt"| DebtTokenATA
+    LiqEngine -->|"Optional: Instant Burn & Redeem"| NectarMint
+    NectarMint -->|"Unwind Underlying"| NectarUnderlyingVault
+    NectarUnderlyingVault -->|"Settle Liquidator PnL"| Liquidator
 
-    KeeperBot -->|"Crank: evaluate_margin_or_settle()"| NectarCore
-    OracleFeeds -->|"Provide Spot Price"| NectarCore
-    NectarCore -->|"CPI: Execute Maturity Redeem or Margin Liquidation"| DominionMarket
-    DominionMarket -->|"Return Principal + Coupon Yield"| UnderlyingVault
-    UnderlyingVault -->|"1. Settle Senior Fixed Yield"| SeniorToken
-    UnderlyingVault -->|"2. Sweep Residual Alpha Carry"| JuniorToken
+    Keeper -->|"Harvest & Auto-compound"| NectarVaultState

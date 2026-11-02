@@ -1,0 +1,9 @@
+nectar_dominion: Structured Tranche Yield Integration
+    ✔ 1. Successfully initializes the Dominion Market with Risk Subordination (451ms)
+    ✔ 2. Prevents Senior deposits if Junior Subordination Buffer is not satisfied (124ms)
+    ✔ 3. Successfully funds Junior First-Loss Buffer Tranche (312ms)
+    ✔ 4. Allows Senior deposit when Subordination Ratio condition is satisfied (298ms)
+    ✔ 5. Settles epoch via Keeper crank: guarantees Senior return & directs surplus to Junior (3150ms)
+    ✔ 6. Allows Senior withdrawal of principal and guaranteed yield (285ms)
+
+  6 passing (4.62s)

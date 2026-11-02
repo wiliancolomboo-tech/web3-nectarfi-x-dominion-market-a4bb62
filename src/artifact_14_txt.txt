@@ -1,0 +1,16 @@
+SECURITY THREAT MODEL & MITIGATIONS
+┌──────────────────────────────────────┬────────────────────────────────────────────────────────┐
+│ Threat Vector                        │ Engineered Mitigation                                  │
+├──────────────────────────────────────┼────────────────────────────────────────────────────────┤
+│ Reentrancy on Splitting              │ Anchor CPI checks + Checks-Effects-Interactions (CEI). │
+│                                      │ State indices updated before token transfers.          │
+├──────────────────────────────────────┼────────────────────────────────────────────────────────┤
+│ Premature PT Liquidation             │ Hard consensus clock verification (Unix timestamp      │
+│                                      │ checked against sysvar::Clock).                        │
+├──────────────────────────────────────┼────────────────────────────────────────────────────────┤
+│ Inflation / Index Manipulation       │ 1e18 fixed-point scaling factor. Decimal precision     │
+│                                      │ prevents rounding down to zero for micro-claims.       │
+├──────────────────────────────────────┼────────────────────────────────────────────────────────┤
+│ Fake Token Hijack                    │ Explicit `has_one` mint constraints on market state.   │
+│                                      │ Vault PDA seeds strictly isolated per market.          │
+└──────────────────────────────────────┴────────────────────────────────────────────────────────┘

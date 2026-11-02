@@ -1,0 +1,10 @@
+NectarFi x Dominion Market: Comprehensive Lifecycle Matrix
+    ✔ Test 1: Initialize Dominion Market underwritten by NectarFi Collateral (412ms)
+    ✔ Test 2: Alice mints complete sets (Locks nSOL -> Mints YES + NO tokens) (325ms)
+    ✔ Test 3: Alice merges partial complete sets (Burns 50 YES + 50 NO -> Unlocks 50 nSOL) (310ms)
+    ✔ Test 4: Reject settlement before expiration timestamp (48ms)
+    ✔ Test 5: Oracle settles market as YES after expiration with yield-boosted virtual price (5210ms)
+    ✔ Test 6: Alice redeems winning YES tokens and captures principal + NectarFi yield bonus (344ms)
+    ✔ Test 7: Security check - Prevent redeeming losing NO tokens (52ms)
+
+  7 passing (6.7s)

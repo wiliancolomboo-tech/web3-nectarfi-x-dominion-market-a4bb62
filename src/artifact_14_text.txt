@@ -1,0 +1,15 @@
++------------------------------------+---------------------------------------+------------------------------------------+
+| Threat Vector                      | Vulnerability Profile                 | Engineered Mitigation                    |
++------------------------------------+---------------------------------------+------------------------------------------+
+| PDA Seed Collision / Spoofing      | Fake market accounts draining vaults  | Deterministic seed derivation with       |
+|                                    | via altered bumps                     | canonical bump storage and checked seeds |
++------------------------------------+---------------------------------------+------------------------------------------+
+| Cross-Program Reentrancy           | Re-entering withdraw prior to share   | Strict Checks-Effects-Interactions (CEI):|
+|                                    | supply state write                    | ledger decremented before token transfer |
++------------------------------------+---------------------------------------+------------------------------------------+
+| Arithmetic Overflow / Truncation   | Overflow in multi-factor share math   | Rust checked_* arithmetic with dedicated |
+|                                    | causing share dilution                | 1e12 scalar precision, zero unwrap()     |
++------------------------------------+---------------------------------------+------------------------------------------+
+| Oracle Staleness & Arbitrage       | Exploiting lagged prices to front-run | Slot-latency threshold (<25 slots) and   |
+|                                    | tranche distribution                  | max confidence interval checking         |
++------------------------------------+---------------------------------------+------------------------------------------+

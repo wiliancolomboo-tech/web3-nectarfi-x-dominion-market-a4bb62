@@ -1,4 +1,11 @@
-cd keeper
-pip install -r requirements.txt
-export SOLANA_RPC_URL="https://api.devnet.solana.com"
-python crank_bot.py
+# 1. Set configuration to devnet
+solana config set --url https://api.devnet.solana.com
+
+# 2. Airdrop deployment gas
+solana airdrop 2
+
+# 3. Deploy contract binary
+anchor deploy --provider.cluster devnet
+
+# 4. Verify on-chain program
+solana program show target/deploy/nectar_dominion-keypair.json

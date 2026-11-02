@@ -1,0 +1,12 @@
+{
+  "rpcUrl": "http://127.0.0.1:8899",
+  "keypairPath": "~/.config/solana/id.json",
+  "programId": "NectDom111111111111111111111111111111111111",
+  "vaultPda": "ENTER_DERIVED_VAULT_PDA",
+  "strategyPda": "ENTER_DERIVED_STRATEGY_PDA",
+  "dominionMarket": "ENTER_DOMINION_MARKET_PUBKEY",
+  "dominionEscrow": "ENTER_ESCROW_TOKEN_ACCOUNT",
+  "vaultTokenAccount": "ENTER_VAULT_TOKEN_ACCOUNT",
+  "keeperRewardAccount": "ENTER_KEEPER_REWARD_TOKEN_ACCOUNT",
+  "pollIntervalMs": 3000
+}

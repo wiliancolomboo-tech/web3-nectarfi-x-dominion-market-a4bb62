@@ -1,0 +1,8 @@
+┌────────────────────────────────────────────────────────────────────────┐
+│                        SECURITY INVARIANT BOUNDS                       │
+├──────────────────────────────────┬─────────────────────────────────────┤
+│ 1. Solvency Parity:              │ Escrowed_Collateral >= Total_PT     │
+│ 2. Yield Distribution Isolation: │ Yield_Balance = Current - Total_PT  │
+│ 3. Signer Verification:          │ Auth_PDA derived deterministically   │
+│ 4. Fixed-Point Integrity:        │ Checked WAD math prevents overflow  │
+└──────────────────────────────────┴─────────────────────────────────────┘

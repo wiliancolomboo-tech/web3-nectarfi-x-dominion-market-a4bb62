@@ -1,0 +1,48 @@
+flowchart TD
+    subgraph ClientLayer [Client & Institutional Orchestration]
+        LP[Liquidity Provider / Trader]
+        CLI[Automation Bot / Enterprise Worker]
+        Oracle[Dominion Oracle / Market Resolver]
+    end
+
+    subgraph AnchorEngine [Nectar-Dominion Solana On-Chain Program]
+        InitVault[1. initialize_market_vault]
+        DepositStake[2. deposit_and_underwrite]
+        SplitTokens[3. mint_conditional_tokens]
+        Resolve[4. resolve_market]
+        Settle[5. settle_and_claim_yield]
+    end
+
+    subgraph NectarCore [NectarFi Yield Layer]
+        NectarVault[NectarFi Liquidity Vault]
+        YieldPool[Lending / AMM Yield Reserve]
+    end
+
+    subgraph DominionCore [Dominion Market Prediction Layer]
+        MarketState[Market State Account: YES/NO Tranches]
+        ConditionalEscrow[Conditional Token Escrow Vault]
+    end
+
+    subgraph EnterpriseOps [Enterprise Notification & Telemetry Layer]
+        WorkerNode[Node.js Engine Worker]
+        WebhookDispatcher[Slack / Discord Webhook]
+        ResendAPI[Resend Email Gateway]
+    end
+
+    LP -->|Deposit USDC & Specify Market| DepositStake
+    DepositStake -->|Transfer USDC| NectarVault
+    NectarVault -->|Generate Yield| YieldPool
+    NectarVault -->|Mint nReceipt Shares| ConditionalEscrow
+    ConditionalEscrow -->|Mint YES/NO Claims| SplitTokens
+    SplitTokens -->|Credit Outcome Tranches| MarketState
+    
+    Oracle -->|Post Event Outcome Proof| Resolve
+    Resolve -->|Lock Winning Tranche| MarketState
+
+    LP -->|Burn Winning Tranche| Settle
+    Settle -->|Redeem Principal + Accrued Nectar Yield| LP
+
+    CLI -->|Poll Health, Solvency & Heartbeat| AnchorEngine
+    AnchorEngine -.->|Emit On-Chain Events| WorkerNode
+    WorkerNode -->|Dispatch Incident / Settlement Alert| WebhookDispatcher
+    WorkerNode -->|High-Priority Email Notification| ResendAPI

@@ -1,0 +1,28 @@
+### [0:00 - 0:25] Hook & The Core Problem
+[VISUAL]: Camera on screen showing traditional prediction market architecture where millions in USDC sit dormant in escrow. Red alert banner: "Dormant Capital Penalty: 0% APY".
+[NARRATOR]:
+"Prediction markets are one of Web3's highest-velocity sectors, but they suffer from a silent tax: capital idleness. When you deposit liquidity into a standard prediction market on Solana, your collateral sits completely dead for weeks awaiting resolution. 
+Today, we change that. Introducing NectarFi times Dominion Market: the first yield-accruing prediction engine on Solana that turns locked speculative collateral into continuous structured yield."
+
+### [0:25 - 0:55] Architecture & Live Initialization
+[VISUAL]: Switch to VS Code terminal. Run Anchor test suite (`anchor test --skip-lint`). 
+Terminal outputs green checkmarks for `initialize_market` and `mint_outcome_tokens`. Visual overlay shows the Mermaid architecture mapping PDAs.
+[NARRATOR]:
+"Built directly on native Anchor 0.30, our engine routes incoming collateral straight through Dominion Market's binary share generation while escrowing capital in NectarFi yield tranches. 
+Notice this transaction: When a trader mints 1,000 USDC of YES and NO pairs, the program binds the tokens to canonical PDAs and simultaneously indexes the market to NectarFi's yield growth benchmark. Incurring less than 42,000 Compute Units, it operates cleanly within Solana's micro-execution window."
+
+### [0:55 - 1:25] Autonomous Keeper Harvest & Settlement
+[VISUAL]: Terminal triggers `harvest_yield_crank`. The index shifts from 1.000 to 1.050. Next command triggers oracle resolution: Outcome YES.
+[NARRATOR]:
+"While the market is active, autonomous keepers invoke our low-CU harvest crank. Look at the ledger index: as NectarFi vaults accrue interest, our fixed-point index dynamically reprices the underlying pool value without requiring continuous token rebase transactions.
+When Pyth or Dominion's oracle settles the event, the market state is finalized deterministically in a single instruction."
+
+### [1:25 - 1:45] The Payoff: Redemption with Staking Bonus
+[VISUAL]: Trader executes `redeem_shares`. Terminal output displays: Burned 1,000 YES Tokens -> Received 1,050 USDC.
+[NARRATOR]:
+"Here is the win condition: The trader burns their 1,000 winning YES shares. Instead of receiving just their 1,000 USDC principal, our protocol disburses their original capital PLUS their share of NectarFi yield—1,050 USDC delivered atomically in slot. Market makers get boosted APR, traders get free yield, and liquidity stays on Solana."
+
+### [1:45 - 2:00] Closing Pitch & Why We Win
+[VISUAL]: Full screen graphic displaying GitHub repo stats, zero-warning test run, and architecture diagrams.
+[NARRATOR]:
+"Full unit test coverage, zero-placeholder Anchor Rust implementation, sub-45k Compute Unit optimizations, and complete integration between NectarFi and Dominion Market. This is production-ready DeFi infrastructure built for scale. Thank you."

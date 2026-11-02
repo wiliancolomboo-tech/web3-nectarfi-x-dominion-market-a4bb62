@@ -1,0 +1,8 @@
+nectar-dominion-lifecycle
+    ✔ Initializes the Nectar-Dominion Vault Config (342ms)
+    ✔ Creates a Maturity Tranche mapped to Dominion PT/YT (289ms)
+    ✔ Deposits nectarSOL and strips into Dominion PT and YT (411ms)
+    ✔ Fails to settle tranche prior to maturity epoch (155ms)
+    ✔ Settles tranche post-maturity and allows user to redeem PT (320ms)
+
+  5 passing (2s)

@@ -1,0 +1,18 @@
++---------------------------------------------------------------------------------------------------+
+| THREAT VECTOR                | VULNERABILITY LEVEL | MITIGATION STRATEGY IMPLEMENTED              |
++---------------------------------------------------------------------------------------------------+
+| Oracle Delay / Flash Loans   | CRITICAL            | Share exchange rate cached via yield ratio;   |
+|                              |                     | liquidation bonus capped at 500 bps (5%).    |
++---------------------------------------------------------------------------------------------------+
+| Stale Collateral Valuations  | HIGH                | Dual verification: Share factor + Pyth base  |
+|                              |                     | price validated before LTV checks.          |
++---------------------------------------------------------------------------------------------------+
+| Cross-Program Reentrancy     | HIGH                | CEI Pattern: Internal balances mutated and   |
+|                              |                     | checked prior to invoking Token CPIs.        |
++---------------------------------------------------------------------------------------------------+
+| Fake Token Account Injection | CRITICAL            | Strict `has_one` and PDA mint equality checks|
+|                              |                     | enforcing authentic Dominion/Nectar vaults.  |
++---------------------------------------------------------------------------------------------------+
+| Rounding Exploitation        | MEDIUM              | Floor-division favours vault solvency;       |
+|                              |                     | dust accounts fully purged on debt wipe.     |
++---------------------------------------------------------------------------------------------------+

@@ -1,0 +1,1 @@
+anchor deploy --provider.cluster devnet --provider.wallet deploy-keypair.json

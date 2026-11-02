@@ -1,0 +1,5 @@
+flowchart LR
+    A[Threat Vector: Oracle Spoofing] --> B[Remediation: Hardcoded Market Oracle PDA & Signature Check]
+    C[Threat Vector: Reentrancy & Double Claim] --> D[Remediation: Strict State Mutation Prior to CPI Outflows]
+    E[Threat Vector: PDA Bump Grinding] --> F[Remediation: Enforce Canonical Bumps derived on Initialization]
+    G[Threat Vector: Arithmetic Overflow / Underflow] --> H[Remediation: Rust checked_math across all yields & BPS]

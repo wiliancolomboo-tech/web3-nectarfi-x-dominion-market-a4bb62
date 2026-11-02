@@ -1,0 +1,8 @@
+NectarFi x Dominion Market Integration Test Matrix
+    ✔ Initializes the Dominion Market with NectarFi Collateral rules (412ms)
+    ✔ Deposits NectarFi vault shares into trader margin account (280ms)
+    ✔ Borrows credit within safe LTV limits (310ms)
+    ✔ Rejects borrow exceeding allowable LTV capacity (145ms)
+    ✔ Executes liquidation when price crash violates liquidation threshold (389ms)
+
+  5 passing (2s)

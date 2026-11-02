@@ -1,1 +1,1 @@
-anchor test
+anchor build

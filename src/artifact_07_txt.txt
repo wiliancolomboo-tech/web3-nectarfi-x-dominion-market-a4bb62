@@ -1,0 +1,20 @@
++--------------------------------+--------------------------------------+----------------------------------------------------------+
+| Threat / Attack Vector         | Severity                             | Mitigation Mechanism                                     |
++--------------------------------+--------------------------------------+----------------------------------------------------------+
+| Flash-Loan Waterfall Arbitrage | Critical                             | Epoch bounds check: Redemptions cannot execute inside    |
+|                                |                                      | the same slot as a deposit; waterfall requires epoch    |
+|                                |                                      | timestamp verification (`now >= epoch_end`).            |
+|                                |                                      |                                                          |
+| PDA Substitution / Fake Mint   | Critical                             | Mint accounts are strictly derived via PDA:             |
+|                                |                                      | `seeds = [b"senior_mint", vault.key()]`. Fake receipts   |
+|                                |                                      | are rejected at the deserialization stage.              |
+|                                |                                      |                                                          |
+| Escrow Drainage via CPI        | High                                 | Vault Escrow is an ATA owned solely by the Vault PDA;    |
+|                                |                                      | withdrawals mandate PDA signature with stored bump.     |
+|                                |                                      |                                                          |
+| Integer Overflow / Truncation  | High                                 | 100% of arithmetic operations utilize `checked_*`       |
+|                                |                                      | macros with explicit `VaultError::MathOverflow`.         |
+|                                |                                      |                                                          |
+| Denial of Service via Crank    | Medium                               | `settle_epoch_waterfall` is completely permissionless;   |
+| Extinction                     |                                      | any keeper, bot, or user can crank the state advance.    |
++--------------------------------+--------------------------------------+----------------------------------------------------------+

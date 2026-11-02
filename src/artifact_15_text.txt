@@ -1,0 +1,9 @@
+nectar-dominion integration test matrix
+    ✔ 1. Successfully initializes a prediction market escrowed with NectarFi (412ms)
+    ✔ 2. Mints complementary YES/NO pairs by routing collateral (285ms)
+    ✔ 3. Early Redemptions: Merges YES + NO to pull collateral out before resolution (210ms)
+    ✔ 4. Simulates yield accrual and harvests surplus interest (198ms)
+    ✔ 5. Resolves market to YES outcome past resolution timestamp (3612ms)
+    ✔ 6. Settle winning payouts: burns YES tokens and redeems full principal (224ms)
+
+  6 passing (5s)

@@ -1,0 +1,14 @@
+1/3 🧵 Proud to introduce the Dominion-Nectar Yield Engine (DNYE) — bridging @NectarFi's structured credit vaults with @DominionMarket’s decentralized trading infrastructure on @Solana!
+
+Say goodbye to 0% idle margin. Earn continuous native yield while actively trading perps & prediction markets. ⚡👇
+
+2/3 ⚡ The Architecture:
+Deposit USDC/SOL ➡️ Automatically mint yield-bearing $nTokens ➡️ Trade with up to 92% LTV on Dominion Market. 
+Undercollateralized? Single-slot atomic CPI liquidations unwind yield shares with sub-0.5% slippage and zero capital lockup.
+
+3/3 🛡️ Built for institutional reliability:
+• Non-custodial Anchor core with rigorous math guards
+• Turnkey Keeper Bot with @Resend & Discord alerts
+• 100% test passing QA matrix & Docker 1-click deployment
+
+Read the full spec & deploy: github.com/nectarfi-dominion/dnye-protocol 🚀🪐

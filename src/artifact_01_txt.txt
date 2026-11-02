@@ -1,0 +1,26 @@
++---------------------------------------+
+                      |       Institutional Capital / LPs     |
+                      +-------------------+-------------------+
+                                          |
+                        Deposits Underlying Assets ($USDC)
+                                          v
+                      +---------------------------------------+
+                      |         NectarFi Yield Core           |
+                      |   (Accrues Compounded Base APY)       |
+                      +-------------------+-------------------+
+                                          |
+                     Mints Interest-Bearing Collateral (nUSDC)
+                                          v
+      +-----------------------------------------------------------------------+
+      |               Nectar-Dominion Cross-Protocol Controller                |
+      +-----------------------------------+-----------------------------------+
+                                          |
+          Routes Collateral to Dominion Market Prediction Pools (YES/NO)
+                                          v
+             +----------------------------+----------------------------+
+             |                                                         |
+             v                                                         v
++-------------------------+                               +-------------------------+
+|   Dominion Outcome: YES  |                               |   Dominion Outcome: NO  |
+|  Yield-Collateralized   |                               |  Yield-Collateralized   |
++-------------------------+                               +-------------------------+

@@ -1,0 +1,199 @@
+import * as anchor from "@coral-xyz/anchor";
+import { Program } from "@coral-xyz/anchor";
+import { expect } from "chai";
+import {
+  createMint,
+  getOrCreateAssociatedTokenAccount,
+  mintTo,
+  getAccount,
+  TOKEN_PROGRAM_ID,
+} from "@solana/spl-token";
+
+describe("nectar-dominion-market", () => {
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
+
+  const program = anchor.workspace.NectarDominionMarket as Program;
+  const connection = provider.connection;
+
+  const maker = anchor.web3.Keypair.generate();
+  const taker = anchor.web3.Keypair.generate();
+  const keeper = anchor.web3.Keypair.generate();
+  const feeRecipient = anchor.web3.Keypair.generate();
+
+  const marketId = new anchor.BN(1);
+
+  let assetMint: anchor.web3.PublicKey;
+  let paymentMint: anchor.web3.PublicKey;
+  let makerAssetAta: anchor.web3.PublicKey;
+  let makerPayAta: anchor.web3.PublicKey;
+  let takerAssetAta: anchor.web3.PublicKey;
+  let takerPayAta: anchor.web3.PublicKey;
+  let feeVaultAta: anchor.web3.PublicKey;
+  let marketPda: anchor.web3.PublicKey;
+  let marketBump: number;
+  let listingPda: anchor.web3.PublicKey;
+  let listingBump: number;
+  let vaultPda: anchor.web3.PublicKey;
+  let vaultBump: number;
+
+  const PRICE = new anchor.BN(2_000_000); // 2 USDC if 6 decimals
+  const TOTAL = new anchor.BN(10_000_000); // 10 units
+  const FEE_BPS = 25; // 0.25%
+
+  const airdrop = async (pk: anchor.web3.PublicKey) => {
+    await connection.requestAirdrop(pk, 2 * anchor.web3.LAMPORTS_PER_SOL);
+    await new Promise((r) => setTimeout(r, 300));
+  };
+
+  const deriveMarketPda = async () => {
+    const [p, b] = await anchor.web3.PublicKey.findProgramAddress(
+      [Buffer.from("market"), provider.wallet.publicKey.toBuffer(), marketId.toArrayLike(Buffer, "le", 8)],
+      program.programId
+    );
+    marketPda = p; marketBump = b;
+  };
+
+  before(async () => {
+    await Promise.all([airdrop(maker.publicKey), airdrop(taker.publicKey), airdrop(keeper.publicKey)]);
+    assetMint = await createMint(connection, provider.wallet.payer, provider.wallet.publicKey, null, 6);
+    paymentMint = await createMint(connection, provider.wallet.payer, provider.wallet.publicKey, null, 6);
+
+    makerAssetAta = (await getOrCreateAssociatedTokenAccount(
+      connection,
+      provider.wallet.payer,
+      assetMint,
+      maker.publicKey
+    )).address;
+    makerPayAta = (await getOrCreateAssociatedTokenAccount(
+      connection,
+      provider.wallet.payer,
+      paymentMint,
+      maker.publicKey
+    )).address;
+    takerAssetAta = (await getOrCreateAssociatedTokenAccount(
+      connection,
+      provider.wallet.payer,
+      assetMint,
+      taker.publicKey
+    )).address;
+    takerPayAta = (await getOrCreateAssociatedTokenAccount(
+      connection,
+      provider.wallet.payer,
+      paymentMint,
+      taker.publicKey
+    )).address;
+    feeVaultAta = (await getOrCreateAssociatedTokenAccount(
+      connection,
+      provider.wallet.payer,
+      paymentMint,
+      feeRecipient.publicKey
+    )).address;
+
+    // Mint initial balances
+    await mintTo(connection, provider.wallet.payer, assetMint, makerAssetAta, provider.wallet.payer, 20_000_000);
+    await mintTo(connection, provider.wallet.payer, paymentMint, takerPayAta, provider.wallet.payer, 1_000_000_000);
+  });
+
+  it("initializes market", async () => {
+    await deriveMarketPda();
+
+    await program.methods
+      .initializeMarket(marketId, FEE_BPS, keeper.publicKey, feeRecipient.publicKey)
+      .accounts({
+        market: marketPda,
+        authority: provider.wallet.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+      })
+      .rpc();
+
+    const market = await program.account.market.fetch(marketPda);
+    expect(market.authority.toBase58()).to.eq(provider.wallet.publicKey.toBase58());
+    expect(Number(market.takerFeeBps)).to.eq(FEE_BPS);
+    expect(market.marketId.toString()).to.eq(marketId.toString());
+  });
+
+  it("create -> settle listing", async () => {
+    // list id should be 0 initially
+    const listingId = new anchor.BN(0);
+    const expiry = new anchor.BN(Math.floor(Date.now() / 1000) + 3600);
+
+    const [listing, lb] = await anchor.web3.PublicKey.findProgramAddress(
+      [Buffer.from("listing"), marketPda.toBuffer(), listingId.toArrayLike(Buffer, "le", 8)],
+      program.programId
+    );
+    listingPda = listing;
+    listingBump = lb;
+
+    const [vault] = await anchor.web3.PublicKey.findProgramAddress(
+      [Buffer.from("vault"), listing.toBuffer()],
+      program.programId
+    );
+    vaultPda = vault;
+
+    // fetch vault bump by local derivation
+    const [, vb] = await anchor.web3.PublicKey.findProgramAddress([Buffer.from("vault"), listing.toBuffer()], program.programId);
+    vaultBump = vb;
+
+    await program.methods
+      .createListing(listingId, TOTAL, PRICE, expiry)
+      .accounts({
+        market: marketPda,
+        maker: maker.publicKey,
+        listing,
+        vault,
+        makerAssetAccount: makerAssetAta,
+        assetMint,
+        paymentMint,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .signers([maker])
+      .rpc();
+
+    const list = await program.account.listing.fetch(listingPda);
+    expect(list.remainingAmount.toString()).to.eq(TOTAL.toString());
+
+    const settleQty = new anchor.BN(3_000_000);
+    const takerBefore = Number((await getAccount(connection, takerPayAta)).amount);
+
+    await program.methods
+      .matchAndSettle(settleQty, false)
+      .accounts({
+        market: marketPda,
+        listing: listingPda,
+        taker: taker.publicKey,
+        vault: vaultPda,
+        takerAssetAccount: takerAssetAta,
+        takerPaymentAccount: takerPayAta,
+        makerPaymentAccount: makerPayAta,
+        makerAssetAccount: makerAssetAta,
+        feeVaultAccount: feeVaultAta,
+        paymentMint: paymentMint,
+        tokenProgram: TOKEN_PROGRAM_ID,
+        keeper: keeper.publicKey,
+      })
+      .signers([taker, keeper])
+      .rpc();
+
+    const takerAfter = Number((await getAccount(connection, takerPayAta)).amount);
+    expect(takerAfter).to.be.lessThan(takerBefore);
+  });
+
+  it("cancel remaining listing by maker", async () => {
+    await program.methods
+      .cancelListing()
+      .accounts({
+        market: marketPda,
+        listing: listingPda,
+        maker: maker.publicKey,
+        makerAssetAccount: makerAssetAta,
+        vault: vaultPda,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .signers([maker])
+      .rpc();
+
+    const list = await program.account.listing.fetch(listingPda);
+    expect(list.status).to.eq(2); // Cancelled
+  });
+});

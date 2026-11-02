@@ -1,0 +1,9 @@
+NectarFi x Dominion Market Full Lifecycle Verification
+    ✔ T01: Initializes Dominion Market with NectarFi Vault link (421ms)
+    ✔ T02: Mints complete sets (Deposits Nectar shares, mints YES + NO) (380ms)
+    ✔ T03: Fails premature resolution before timestamp (120ms)
+    ✔ T04: Resolves market to YES after timestamp expiry (3120ms)
+    ✔ T05: Prevents claim with losing NO tokens (115ms)
+    ✔ T06: Claims full winnings with YES tokens + harvests yield shares (395ms)
+
+  6 passing (4.6s)

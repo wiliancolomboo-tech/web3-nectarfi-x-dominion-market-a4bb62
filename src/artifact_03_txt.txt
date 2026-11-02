@@ -1,0 +1,29 @@
++-------------------------------------------------------------------------------------------------+
+|                                 ENTERPRISE RPC GATEWAY (Helius / Triton)                         |
++-----------------------------------------------+-------------------------------------------------+
+                                                |
+                                                v
++-----------------------------------------------+-------------------------------------------------+
+|                       NECTAR-DOMINION SOLANA ON-CHAIN PROGRAM                                   |
+|   Program ID: NectDominionMarketVault1111111111111111111111                                     |
+|                                                                                                 |
+|   Accounts:                                                                                     |
+|   - MarketConfig (Dominion Market Metadata, Resolution Authority, Fee Structures)               |
+|   - YieldEscrow (NectarFi cToken/Receipt Token Balance & Principal Tracker)                     |
+|   - OutcomePositionPool (Dominion Outcome Distribution: Tranche YES / Tranche NO)               |
++-----------------------------------------------+-------------------------------------------------+
+                                                |
+                                                v
++-----------------------------------------------+-------------------------------------------------+
+|                         AUTOMATION & MONITORING WORKER SERVICE                                  |
+|   - Stream Anchor logs via WebSocket (solanaWeb3.Connection)                                   |
+|   - Solvency verification: (Escrow Receipts * ExchangeRate) >= Total Underwritten Liabilities    |
+|   - Autonomous Resolution Trigger on Oracle Finalization                                       |
++-----------------------------------------------+-------------------------------------------------+
+                        |                                       |
+                        v                                       v
++---------------------------------------+       +---------------------------------------+
+|   ENTERPRISE DISCORD/SLACK WEBHOOKS   |       |   RESEND TRANSACTIONAL EMAIL API      |
+|   - Instant settlement alerts         |       |   - Critical alerts to fund ops       |
+|   - Real-time yield index updates     |       |   - Payout reconciliations & audits   |
++---------------------------------------+       +---------------------------------------+

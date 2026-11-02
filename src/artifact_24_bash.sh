@@ -1,0 +1,1 @@
+solana account <MARKET_PDA_PUBKEY>

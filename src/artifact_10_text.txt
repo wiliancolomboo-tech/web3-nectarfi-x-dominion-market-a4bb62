@@ -1,10 +1,9 @@
-NectarFi x Dominion Market: Tranche & Settlement Tests
-    ✔ 1. Initializes Vault linked to Dominion Market Note (390ms)
-    ✔ 2. Prevents Senior deposit without required Junior first-loss protection buffer (42ms)
-    ✔ 3. Successfully deposits Junior first-loss tranche capital (180ms)
-    ✔ 4. Accepts Senior deposits once safety buffer is established (172ms)
-    ✔ 5. Settles vault post-maturity and enforces senior priority waterfall (5110ms)
-    ✔ 6. Senior redeems full principal + fixed guaranteed yield (190ms)
-    ✔ 7. Junior redeems residual alpha profit pool (185ms)
+nectar_dominion e2e test suite
+    ✔ 1. Initializes a NectarFi Yield-Bearing Binary Market (412ms)
+    ✔ 2. Splits NectarFi Collateral into YES and NO Claim Tokens (308ms)
+    ✔ 3. Merges paired YES and NO tokens back into Collateral (290ms)
+    ✔ 4. Simulates NectarFi Yield Accrual in Collateral Vault (185ms)
+    ✔ 5. Resolves Market with Outcome YES & Accrued Yield Index (5102ms)
+    ✔ 6. Redeems Winning YES Tokens to capture Principal + Compounded Yield (315ms)
 
-  7 passing (6.3s)
+  6 passing (6.6s)

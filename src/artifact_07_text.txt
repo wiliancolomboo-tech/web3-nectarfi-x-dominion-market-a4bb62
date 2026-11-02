@@ -1,0 +1,9 @@
+nectar_dominion end-to-end QA test suite
+    ✔ 1. Initializes Market with correct PDA constraints and zero initial yield index (452ms)
+    ✔ 2. Mints $YES and $NO outcome tokens while depositing collateral into yield pipeline (388ms)
+    ✔ 3. Harvests NectarFi streaming yield into vault, increasing the global yield index (312ms)
+    ✔ 4. Rejects market resolution before expiration timestamp (180ms)
+    ✔ 5. Resolves Market successfully after expiration (YES Outcome) (4025ms)
+    ✔ 6. Redeems winning YES shares for Principal + Pro-Rata Nectar Accrued Yield (395ms)
+
+  6 passing (5.75s)

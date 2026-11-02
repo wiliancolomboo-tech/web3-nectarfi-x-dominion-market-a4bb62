@@ -1,0 +1,9 @@
+nectar_dominion integration test suite
+    ✔ QA-01: Successfully initializes a NectarFi-backed Dominion market (184ms)
+    ✔ QA-02: User deposits collateral and receives dual outcome tokens (YES & NO) (210ms)
+    ✔ QA-03: Keeper harvests yield from NectarFi and updates accumulator (195ms)
+    ✔ QA-04: Resolves market to Outcome A (YES) (125ms)
+    ✔ QA-05: Redeems winning Outcome A tokens for principal + prorated yield (224ms)
+    ✔ QA-06: Prevents losing Outcome B tokens from claiming redemptions (98ms)
+
+  6 passing (1.04s)

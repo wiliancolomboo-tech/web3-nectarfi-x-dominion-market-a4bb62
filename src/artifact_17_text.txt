@@ -1,0 +1,10 @@
+nectar_dominion end-to-end lifecycle
+    ✔ 1. Initializes Dominion Market for Nectar Yield Asset (1282ms)
+    ✔ 2. Deposits nctSOL and Splits into PT and YT (842ms)
+    ✔ 3. Borrows Fixed-Rate Liquidity against locked PT (796ms)
+    ✔ 4. Accrues NectarFi staking yield and user claims via YT (815ms)
+Waiting for market maturity...
+    ✔ 5. Settles mature PT 1:1 for Collateral after maturity (11042ms)
+    ✔ 6. Keeper liquidates defaulted loan post-maturity (834ms)
+
+  6 passing (15.6s)

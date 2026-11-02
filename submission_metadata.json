@@ -1,0 +1,70 @@
+{
+  "deliverable_id": "superteam_3933f8a4bb62",
+  "opportunity_id": "st-b6fb5b64-9755-4e6d-8b86-1573f35e33a1",
+  "platform": "SuperteamEarn",
+  "title": "NectarFi x Dominion Market",
+  "url": "https://earn.superteam.fun/listings/bounty/nectarfi-x-dominion-market",
+  "budget": "1,000 USDG",
+  "prize_amount": 1000.0,
+  "ecosystem": "Solana",
+  "github_url": "https://github.com/wiliancolomboo-tech/web3-nectarfi-x-dominion-market-a4bb62",
+  "status": "validation_warning",
+  "validation_reports": [
+    {
+      "file": "artifact_01_txt.txt",
+      "language": "txt",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_02_mermaid.txt",
+      "language": "mermaid",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_03_txt.txt",
+      "language": "txt",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_04_rust.rs",
+      "language": "rust",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_05_typescript.ts",
+      "language": "typescript",
+      "valid": false,
+      "error": "Unmatched closing bracket ')'"
+    },
+    {
+      "file": "artifact_06_typescript.ts",
+      "language": "typescript",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_07_bash.sh",
+      "language": "bash",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_08_dockerfile.txt",
+      "language": "dockerfile",
+      "valid": true,
+      "error": null
+    },
+    {
+      "file": "artifact_09_yaml.yaml",
+      "language": "yaml",
+      "valid": true,
+      "error": null
+    }
+  ],
+  "git_initialized": true,
+  "created_at": "2026-09-28 22:48:47"
+}

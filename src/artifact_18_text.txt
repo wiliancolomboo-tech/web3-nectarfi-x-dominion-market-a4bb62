@@ -1,0 +1,9 @@
+NectarFi x Dominion Market: Complete Protocol Suite
+     ✔ 1. Initializes Dominion Tranche Market for Nectar Vault Token (412ms)
+     ✔ 2. Deposits Nectar Collateral and Mints Senior ($dSENIOR) & Junior ($dJUNIOR) Tranches (280ms)
+     ✔ 3. Simulates Real-Time NectarFi Compounded Yield Injection into Vault (195ms)
+     ✔ 4. Prevents settlement before epoch maturity timestamp (45ms)
+     ✔ 5. Keeper triggers Waterfall Settlement after maturity epoch elapses (2650ms)
+     ✔ 6. Redeems both Tranches for accrued waterfall collateral with zero dust (310ms)
+
+   6 passing (4.1s)

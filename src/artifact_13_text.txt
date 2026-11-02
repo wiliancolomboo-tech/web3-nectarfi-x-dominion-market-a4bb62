@@ -1,0 +1,9 @@
+NectarFi x Dominion Market Integration Test Matrix
+    ✔ QA-01: Successfully Initializes NectarFi Tranche Vault (428ms)
+    ✔ QA-02: Deposits USDC and accurately splits into Senior/Junior Tranches (512ms)
+    ✔ QA-03: Initializes Dominion Market AMM Pool (389ms)
+    ✔ QA-04: Provides Dual-Sided Secondary Liquidity to Dominion Market (465ms)
+    ✔ QA-05: Executes Secondary Swap on Dominion Market with Slippage Protection (540ms)
+    ✔ QA-06: Settle Maturity and Burn Senior Notes for Fixed-Yield Redemption (11450ms)
+
+  6 passing (13.8s)

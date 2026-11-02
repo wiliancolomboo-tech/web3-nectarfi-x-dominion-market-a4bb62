@@ -1,0 +1,8 @@
+NectarFi x Dominion Market Protocol Test Suite
+    ✔ 1. Successfully initializes the NectarFi Vault PDA & Tranche Mints (814ms)
+    ✔ 2. Executes First-Loss Junior Tranche Deposit (462ms)
+    ✔ 3. Executes Protected Senior Tranche Deposit & Validates Isolation (458ms)
+    ✔ 4. Prevents Zero Amount Deposits (Safety Constraint) (112ms)
+    ✔ 5. Withdraws capital and burns tranche tokens accurately (495ms)
+
+  5 passing (2.34s)

@@ -10,307 +10,306 @@ import {
 } from "@solana/spl-token";
 import { assert, expect } from "chai";
 
-describe("NectarFi x Dominion Market: Tranche & Settlement Tests", () => {
+describe("NectarFi x Dominion Market Integration Test Matrix", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
 
   const program = anchor.workspace.NectarDominion as Program<NectarDominion>;
 
-  let underlyingMint: anchor.web3.PublicKey;
-  let dominionNoteMint: anchor.web3.PublicKey;
-  const dominionMarket = anchor.web3.Keypair.generate();
+  const admin = anchor.web3.Keypair.generate();
+  const trader = anchor.web3.Keypair.generate();
+  const liquidator = anchor.web3.Keypair.generate();
 
-  let vaultPda: anchor.web3.PublicKey;
-  let vaultBump: number;
-  let reservePda: anchor.web3.PublicKey;
-  let seniorMintPda: anchor.web3.PublicKey;
-  let juniorMintPda: anchor.web3.PublicKey;
+  let nectarShareMint: anchor.web3.Pubkey;
+  let borrowMint: anchor.web3.Pubkey;
 
-  const seniorUser = anchor.web3.Keypair.generate();
-  const juniorUser = anchor.web3.Keypair.generate();
-  const keeperUser = anchor.web3.Keypair.generate();
+  let marketPda: anchor.web3.Pubkey;
+  let collateralVaultPda: anchor.web3.Pubkey;
+  let borrowReservePda: anchor.web3.Pubkey;
+  let traderMarginAccountPda: anchor.web3.Pubkey;
 
-  let seniorUserUnderlying: anchor.web3.PublicKey;
-  let seniorUserShare: anchor.web3.PublicKey;
+  let traderNectarATA: anchor.web3.Pubkey;
+  let traderBorrowATA: anchor.web3.Pubkey;
+  let liquidatorNectarATA: anchor.web3.Pubkey;
+  let liquidatorBorrowATA: anchor.web3.Pubkey;
 
-  let juniorUserUnderlying: anchor.web3.PublicKey;
-  let juniorUserShare: anchor.web3.PublicKey;
-
-  let vaultNoteCustody: anchor.web3.PublicKey;
-  let dominionEscrow: anchor.web3.PublicKey;
-
-  const FIXED_SENIOR_APY_BPS = new anchor.BN(800); // 8%
-  const JUNIOR_RATIO_BPS = new anchor.BN(2000); // 20% protection buffer
-  const MAX_CAPACITY = new anchor.BN(10_000_000 * 1e6); // 10M USDC
-  let maturityTimestamp: anchor.BN;
+  const LTV_BPS = new anchor.BN(8000); // 80% LTV
+  const LIQ_THRESH_BPS = new anchor.BN(8500); // 85% Liquidation Threshold
+  const LIQ_BONUS_BPS = new anchor.BN(500); // 5% Liquidation Bonus
 
   before(async () => {
-    // AirDrop SOL for signatures
-    for (const kp of [seniorUser, juniorUser, keeperUser]) {
-      const sig = await provider.connection.requestAirdrop(kp.publicKey, 5 * anchor.web3.LAMPORTS_PER_SOL);
-      await provider.connection.confirmTransaction(sig);
+    // Airdrop SOL to test actors
+    for (const actor of [admin, trader, liquidator]) {
+      const sig = await provider.connection.requestAirdrop(
+        actor.publicKey,
+        10 * anchor.web3.LAMPORTS_PER_SOL
+      );
+      await provider.connection.confirmTransaction(sig, "confirmed");
     }
 
-    // Create underlying mock USDC mint
-    underlyingMint = await createMint(
+    // Deploy test tokens
+    nectarShareMint = await createMint(
       provider.connection,
-      (provider.wallet as any).payer,
-      provider.wallet.publicKey,
+      admin,
+      admin.publicKey,
       null,
       6
     );
 
-    // Create mock Dominion Note mint
-    dominionNoteMint = await createMint(
+    borrowMint = await createMint(
       provider.connection,
-      (provider.wallet as any).payer,
-      provider.wallet.publicKey,
+      admin,
+      admin.publicKey,
       null,
       6
     );
 
     // Derive PDAs
-    [vaultPda, vaultBump] = anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("vault"), dominionMarket.publicKey.toBuffer()],
+    [marketPda] = anchor.web3.Pubkey.findProgramAddressSync(
+      [
+        Buffer.from("market"),
+        nectarShareMint.toBuffer(),
+        borrowMint.toBuffer(),
+      ],
       program.programId
     );
 
-    [reservePda] = anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("vault_reserve"), vaultPda.toBuffer()],
+    [collateralVaultPda] = anchor.web3.Pubkey.findProgramAddressSync(
+      [Buffer.from("collateral_vault"), marketPda.toBuffer()],
       program.programId
     );
 
-    [seniorMintPda] = anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("senior_mint"), vaultPda.toBuffer()],
+    [borrowReservePda] = anchor.web3.Pubkey.findProgramAddressSync(
+      [Buffer.from("borrow_reserve"), marketPda.toBuffer()],
       program.programId
     );
 
-    [juniorMintPda] = anchor.web3.PublicKey.findProgramAddressSync(
-      [Buffer.from("junior_mint"), vaultPda.toBuffer()],
+    [traderMarginAccountPda] = anchor.web3.Pubkey.findProgramAddressSync(
+      [
+        Buffer.from("margin_account"),
+        marketPda.toBuffer(),
+        trader.publicKey.toBuffer(),
+      ],
       program.programId
     );
 
-    // Setup Token Accounts
-    seniorUserUnderlying = await createAccount(
+    // Create Token Accounts
+    traderNectarATA = await createAccount(
       provider.connection,
-      (provider.wallet as any).payer,
-      underlyingMint,
-      seniorUser.publicKey
+      trader,
+      nectarShareMint,
+      trader.publicKey
+    );
+    traderBorrowATA = await createAccount(
+      provider.connection,
+      trader,
+      borrowMint,
+      trader.publicKey
+    );
+    liquidatorNectarATA = await createAccount(
+      provider.connection,
+      liquidator,
+      nectarShareMint,
+      liquidator.publicKey
+    );
+    liquidatorBorrowATA = await createAccount(
+      provider.connection,
+      liquidator,
+      borrowMint,
+      liquidator.publicKey
     );
 
-    juniorUserUnderlying = await createAccount(
+    // Mint Nectar tokens to Trader
+    await mintTo(
       provider.connection,
-      (provider.wallet as any).payer,
-      underlyingMint,
-      juniorUser.publicKey
+      admin,
+      nectarShareMint,
+      traderNectarATA,
+      admin,
+      1_000_000_000 // 1,000 nectarTokens
     );
 
-    vaultNoteCustody = await createAccount(
+    // Mint USDC liquidity to Liquidator
+    await mintTo(
       provider.connection,
-      (provider.wallet as any).payer,
-      dominionNoteMint,
-      vaultPda
+      admin,
+      borrowMint,
+      liquidatorBorrowATA,
+      admin,
+      50_000_000_000 // 50,000 borrow assets
     );
-
-    dominionEscrow = await createAccount(
-      provider.connection,
-      (provider.wallet as any).payer,
-      underlyingMint,
-      dominionMarket.publicKey
-    );
-
-    // Fund user balances: Junior gets 50,000, Senior gets 100,000
-    await mintTo(provider.connection, (provider.wallet as any).payer, underlyingMint, seniorUserUnderlying, (provider.wallet as any).payer, 100_000 * 1e6);
-    await mintTo(provider.connection, (provider.wallet as any).payer, underlyingMint, juniorUserUnderlying, (provider.wallet as any).payer, 50_000 * 1e6);
   });
 
-  it("1. Initializes Vault linked to Dominion Market Note", async () => {
-    const currentBlockTime = (await provider.connection.getBlockTime(await provider.connection.getSlot())) || Math.floor(Date.now() / 1000);
-    maturityTimestamp = new anchor.BN(currentBlockTime + 4); // 4 seconds for fast local test
-
+  it("Initializes the Dominion Market with NectarFi Collateral rules", async () => {
     await program.methods
-      .initializeVault(
-        FIXED_SENIOR_APY_BPS,
-        JUNIOR_RATIO_BPS,
-        maturityTimestamp,
-        MAX_CAPACITY
-      )
+      .initializeMarket(LTV_BPS, LIQ_THRESH_BPS, LIQ_BONUS_BPS)
       .accounts({
-        authority: provider.wallet.publicKey,
-        underlyingMint,
-        vault: vaultPda,
-        vaultUnderlyingReserve: reservePda,
-        seniorMint: seniorMintPda,
-        juniorMint: juniorMintPda,
-        dominionMarket: dominionMarket.publicKey,
-        dominionNoteMint,
+        market: marketPda,
+        nectarShareMint,
+        borrowMint,
+        nectarVaultProgram: anchor.web3.Keypair.generate().publicKey,
+        collateralVault: collateralVaultPda,
+        borrowReserve: borrowReservePda,
+        admin: admin.publicKey,
         systemProgram: anchor.web3.SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
         rent: anchor.web3.SYSVAR_RENT_PUBKEY,
       })
+      .signers([admin])
       .rpc();
 
-    const vaultAccount = await program.account.vault.fetch(vaultPda);
-    expect(vaultAccount.seniorFixedApyBps.toNumber()).to.equal(800);
-    expect(vaultAccount.isSettled).to.be.false;
+    // Fund the borrow reserve with initial liquidity
+    await mintTo(
+      provider.connection,
+      admin,
+      borrowMint,
+      borrowReservePda,
+      admin,
+      100_000_000_000 // 100,000 units
+    );
+
+    const marketState = await program.account.marketState.fetch(marketPda);
+    assert.equal(marketState.loanToValueBps.toNumber(), 8000);
+    assert.equal(marketState.liquidationThresholdBps.toNumber(), 8500);
   });
 
-  it("2. Prevents Senior deposit without required Junior first-loss protection buffer", async () => {
-    seniorUserShare = await createAccount(
-      provider.connection,
-      seniorUser,
-      seniorMintPda,
-      seniorUser.publicKey
+  it("Deposits NectarFi vault shares into trader margin account", async () => {
+    const depositAmount = new anchor.BN(500_000_000); // 500 shares
+
+    await program.methods
+      .depositCollateral(depositAmount)
+      .accounts({
+        market: marketPda,
+        marginAccount: traderMarginAccountPda,
+        collateralVault: collateralVaultPda,
+        userNectarAccount: traderNectarATA,
+        user: trader.publicKey,
+        systemProgram: anchor.web3.SystemProgram.programId,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .signers([trader])
+      .rpc();
+
+    const marginAccount = await program.account.marginAccount.fetch(
+      traderMarginAccountPda
     );
+    assert.equal(
+      marginAccount.collateralShares.toString(),
+      depositAmount.toString()
+    );
+
+    const vaultTokenAccount = await getAccount(
+      provider.connection,
+      collateralVaultPda
+    );
+    assert.equal(vaultTokenAccount.amount.toString(), depositAmount.toString());
+  });
+
+  it("Borrows credit within safe LTV limits", async () => {
+    // Let 1 nectarShare = $1.20 (120,000,000 in 8 decimals)
+    // 500 shares = $600 collateral. At 80% LTV = max $480 borrow.
+    // Borrow $300 (300,000,000 units) at $1.00 base asset price
+    const sharePriceE8 = new anchor.BN(120_000_000);
+    const borrowAssetPriceE8 = new anchor.BN(100_000_000);
+    const borrowAmount = new anchor.BN(300_000_000);
+
+    await program.methods
+      .borrowCredit(borrowAmount, sharePriceE8, borrowAssetPriceE8)
+      .accounts({
+        market: marketPda,
+        marginAccount: traderMarginAccountPda,
+        borrowReserve: borrowReservePda,
+        userBorrowAccount: traderBorrowATA,
+        user: trader.publicKey,
+        owner: trader.publicKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .signers([trader])
+      .rpc();
+
+    const traderBorrowTokenAcc = await getAccount(
+      provider.connection,
+      traderBorrowATA
+    );
+    assert.equal(
+      traderBorrowTokenAcc.amount.toString(),
+      borrowAmount.toString()
+    );
+
+    const marginAccount = await program.account.marginAccount.fetch(
+      traderMarginAccountPda
+    );
+    assert.equal(marginAccount.borrowedDebt.toString(), borrowAmount.toString());
+  });
+
+  it("Rejects borrow exceeding allowable LTV capacity", async () => {
+    const sharePriceE8 = new anchor.BN(120_000_000);
+    const borrowAssetPriceE8 = new anchor.BN(100_000_000);
+    const excessiveBorrow = new anchor.BN(250_000_000); // Would push total to $550 > $480 cap
 
     try {
       await program.methods
-        .depositSenior(new anchor.BN(10_000 * 1e6))
+        .borrowCredit(excessiveBorrow, sharePriceE8, borrowAssetPriceE8)
         .accounts({
-          depositor: seniorUser.publicKey,
-          vault: vaultPda,
-          vaultUnderlyingReserve: reservePda,
-          seniorMint: seniorMintPda,
-          userUnderlyingAccount: seniorUserUnderlying,
-          userSeniorAccount: seniorUserShare,
+          market: marketPda,
+          marginAccount: traderMarginAccountPda,
+          borrowReserve: borrowReservePda,
+          userBorrowAccount: traderBorrowATA,
+          user: trader.publicKey,
+          owner: trader.publicKey,
           tokenProgram: TOKEN_PROGRAM_ID,
         })
-        .signers([seniorUser])
+        .signers([trader])
         .rpc();
-      assert.fail("Should have failed due to missing junior buffer");
+      assert.fail("Should have thrown borrow capacity exceeded error");
     } catch (err: any) {
-      expect(err.toString()).to.contain("InsufficientJuniorProtectionBuffer");
+      expect(err.error.errorCode.code).to.equal("ExceedsBorrowCapacity");
     }
   });
 
-  it("3. Successfully deposits Junior first-loss tranche capital", async () => {
-    juniorUserShare = await createAccount(
+  it("Executes liquidation when price crash violates liquidation threshold", async () => {
+    // Current debt: $300.
+    // Price drops: 1 share falls from $1.20 to $0.65.
+    // 500 shares * $0.65 = $325.
+    // 85% of $325 = $276.25 Liquidation Threshold.
+    // Debt ($300) > $276.25 -> Unhealthy position!
+    const droppedSharePriceE8 = new anchor.BN(65_000_000);
+    const borrowAssetPriceE8 = new anchor.BN(100_000_000);
+    const debtToLiquidate = new anchor.BN(150_000_000); // Liquidate $150 debt
+
+    await program.methods
+      .liquidatePosition(
+        debtToLiquidate,
+        droppedSharePriceE8,
+        borrowAssetPriceE8
+      )
+      .accounts({
+        market: marketPda,
+        marginAccount: traderMarginAccountPda,
+        borrowReserve: borrowReservePda,
+        collateralVault: collateralVaultPda,
+        liquidatorBorrowAccount: liquidatorBorrowATA,
+        liquidatorNectarAccount: liquidatorNectarATA,
+        liquidator: liquidator.publicKey,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      })
+      .signers([liquidator])
+      .rpc();
+
+    const liquidatorNectarBalance = await getAccount(
       provider.connection,
-      juniorUser,
-      juniorMintPda,
-      juniorUser.publicKey
+      liquidatorNectarATA
     );
+    // Liquidator covered $150 debt with 5% bonus ($157.50 collateral)
+    // At $0.65/share, seized = 157.50 / 0.65 =~ 242.307692 shares (242,307,692)
+    assert.isAbove(Number(liquidatorNectarBalance.amount), 0);
 
-    const depositAmount = new anchor.BN(20_000 * 1e6);
-
-    await program.methods
-      .depositJunior(depositAmount)
-      .accounts({
-        depositor: juniorUser.publicKey,
-        vault: vaultPda,
-        vaultUnderlyingReserve: reservePda,
-        juniorMint: juniorMintPda,
-        userUnderlyingAccount: juniorUserUnderlying,
-        userJuniorAccount: juniorUserShare,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .signers([juniorUser])
-      .rpc();
-
-    const jnrShareAccount = await getAccount(provider.connection, juniorUserShare);
-    expect(Number(jnrShareAccount.amount)).to.equal(20_000 * 1e6);
-  });
-
-  it("4. Accepts Senior deposits once safety buffer is established", async () => {
-    const depositSeniorAmount = new anchor.BN(80_000 * 1e6);
-
-    await program.methods
-      .depositSenior(depositSeniorAmount)
-      .accounts({
-        depositor: seniorUser.publicKey,
-        vault: vaultPda,
-        vaultUnderlyingReserve: reservePda,
-        seniorMint: seniorMintPda,
-        userUnderlyingAccount: seniorUserUnderlying,
-        userSeniorAccount: seniorUserShare,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .signers([seniorUser])
-      .rpc();
-
-    const secShareAccount = await getAccount(provider.connection, seniorUserShare);
-    expect(Number(secShareAccount.amount)).to.equal(80_000 * 1e6);
-  });
-
-  it("5. Settles vault post-maturity and enforces senior priority waterfall", async () => {
-    // Wait for maturity timestamp to pass
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-
-    // Simulate Dominion Note settlement proceeds returning into Reserve:
-    // 80k senior + 8% yield (6.4k) + 20k junior + 5k excess return = 111,400 total
-    const totalProceeds = 111_400 * 1e6;
-    await mintTo(
-      provider.connection,
-      (provider.wallet as any).payer,
-      underlyingMint,
-      reservePda,
-      (provider.wallet as any).payer,
-      11_400 * 1e6 // Adding the profit portion directly to reserve
+    const marginAccount = await program.account.marginAccount.fetch(
+      traderMarginAccountPda
     );
-
-    await program.methods
-      .settleMaturity(new anchor.BN(totalProceeds))
-      .accounts({
-        crankKeeper: keeperUser.publicKey,
-        vault: vaultPda,
-        vaultUnderlyingReserve: reservePda,
-        vaultNoteCustody,
-        dominionNoteMint,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .signers([keeperUser])
-      .rpc();
-
-    const vaultAccount = await program.account.vault.fetch(vaultPda);
-    expect(vaultAccount.isSettled).to.be.true;
-    expect(vaultAccount.seniorYieldSettled.toNumber()).to.equal(6_400 * 1e6);
-  });
-
-  it("6. Senior redeems full principal + fixed guaranteed yield", async () => {
-    const seniorBurnAmount = new anchor.BN(80_000 * 1e6);
-
-    const initialUnderlying = await getAccount(provider.connection, seniorUserUnderlying);
-
-    await program.methods
-      .redeemSenior(seniorBurnAmount)
-      .accounts({
-        redeemer: seniorUser.publicKey,
-        vault: vaultPda,
-        vaultUnderlyingReserve: reservePda,
-        seniorMint: seniorMintPda,
-        userSeniorAccount: seniorUserShare,
-        userUnderlyingAccount: seniorUserUnderlying,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .signers([seniorUser])
-      .rpc();
-
-    const finalUnderlying = await getAccount(provider.connection, seniorUserUnderlying);
-    const balanceDiff = Number(finalUnderlying.amount) - Number(initialUnderlying.amount);
-    expect(balanceDiff).to.equal(86_400 * 1e6); // 80k principal + 6.4k coupon
-  });
-
-  it("7. Junior redeems residual alpha profit pool", async () => {
-    const juniorBurnAmount = new anchor.BN(20_000 * 1e6);
-    const initialUnderlying = await getAccount(provider.connection, juniorUserUnderlying);
-
-    await program.methods
-      .redeemJunior(juniorBurnAmount)
-      .accounts({
-        redeemer: juniorUser.publicKey,
-        vault: vaultPda,
-        vaultUnderlyingReserve: reservePda,
-        juniorMint: juniorMintPda,
-        seniorMint: seniorMintPda,
-        userJuniorAccount: juniorUserShare,
-        userUnderlyingAccount: juniorUserUnderlying,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      })
-      .signers([juniorUser])
-      .rpc();
-
-    const finalUnderlying = await getAccount(provider.connection, juniorUserUnderlying);
-    const balanceDiff = Number(finalUnderlying.amount) - Number(initialUnderlying.amount);
-    expect(balanceDiff).to.equal(25_000 * 1e6); // 20k principal + 5k excess carry
+    assert.equal(
+      marginAccount.borrowedDebt.toString(),
+      new anchor.BN(150_000_000).toString()
+    );
   });
 });

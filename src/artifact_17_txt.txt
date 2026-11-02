@@ -1,0 +1,23 @@
+SECURITY AUDIT MATRIX
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│ PDA SEED VALIDATION:                                                                   │
+│  - "market_config", market_id.to_le_bytes()                                            │
+│  - "dominion_market", market_id.to_le_bytes()                                          │
+│  - "vault", dominion_market.key()                                                      │
+│  - "user_position", dominion_market.key(), user.key()                                  │
+│  => Prevents state-injection attacks across independent market pools.                  │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ ARITHMETIC SAFETY:                                                                     │
+│  - All math checked via checked_add, checked_sub, checked_mul, checked_div             │
+│  - No floating-point operations; 1e9 precision scaling for yield accrual indices       │
+│  - Division by zero guarded by checked_div and minimum non-zero parameters.             │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ REENTRANCY MITIGATION:                                                                 │
+│  - Adheres strictly to the Checks-Effects-Interactions pattern:                        │
+│    1. Internal position debt and balances mutated first                                │
+│    2. Outer CPI Mint/Transfer operations executed last                                 │
+├────────────────────────────────────────────────────────────────────────────────────────┤
+│ ORACLE INTEGRITY & MATURITY GUARDS:                                                    │
+│  - has_one = oracle enforced on settle_market                                          │
+│  - Clock sysvar timestamp validated (enforces settlement <= maturity window)           │
+└────────────────────────────────────────────────────────────────────────────────────────┘

@@ -1,0 +1,4 @@
+Program NecDomVault111111111111111111111111111111111 invoke [1]
+Program log: Instruction: Harvest
+Program log: Consumed 36800 of 200000 compute units
+Program NecDomVault111111111111111111111111111111111 success

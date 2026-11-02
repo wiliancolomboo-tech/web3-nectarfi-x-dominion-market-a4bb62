@@ -1,0 +1,12 @@
+Security Vector                   Mitigation Architecture
+┌───────────────────────────────┐      ┌────────────────────────────────────────────────────────┐
+│ Integer Overflow / Underflow  │ ───> │ checked_* arithmetic, 1e12 fixed-point scale guards    │
+├───────────────────────────────┤      ├────────────────────────────────────────────────────────┤
+│ Frontrunning Market Outcome   │ ───> │ PDA signing oracle auth check & deterministic status   │
+├───────────────────────────────┤      ├────────────────────────────────────────────────────────┤
+│ Reentrancy via CPI            │ ───> │ Checks-Effects-Interactions (state updated pre-CPI)    │
+├───────────────────────────────┤      ├────────────────────────────────────────────────────────┤
+│ False Mint / Spoofed Tokens   │ ───> │ has_one = collateral_mint constraints on market PDA    │
+├───────────────────────────────┤      ├────────────────────────────────────────────────────────┤
+│ Fake Oracle Exploit           │ ───> │ Explicit equality assertion against market.oracle key  │
+└───────────────────────────────┘      └────────────────────────────────────────────────────────┘

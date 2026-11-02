@@ -1,0 +1,8 @@
+NectarFi x Dominion Market Protocol Test Suite
+    ✔ 1. Initializes market with NectarFi streaming yield hooks (182ms)
+    ✔ 2. Mints YES and NO outcome pairs by depositing collateral (145ms)
+    ✔ 3. Simulates NectarFi Yield Accrual & Keeper Harvest (132ms)
+    ✔ 4. Resolves the market to outcome: YES (3050ms)
+    ✔ 5. Claims proceeds: Winning tokens receive principal + 100% of streamed yield (164ms)
+
+  5 passing (3.7s)

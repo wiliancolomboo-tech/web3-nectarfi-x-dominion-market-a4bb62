@@ -1,0 +1,9 @@
+NectarFi x Dominion Market System Test Suite
+    ✔ QA-01: Successfully Initializes NectarFi x Dominion Vault (482ms)
+    ✔ QA-02: Deposit transfers collateral and mints 1:1 initial LP Shares (321ms)
+    ✔ QA-03: Security Rejection: Reject hedge exceeding MAX_HEDGE_RATIO_BPS (210ms)
+    ✔ QA-04: Execute Valid Dominion Hedge Allocation (389ms)
+    ✔ QA-05: Settle Epoch, Collect Outcome Winnings, and Compound Yield (412ms)
+    ✔ QA-06: Withdraw principal plus hedged outcome upside (340ms)
+
+  6 passing (2.15s)

@@ -1,0 +1,9 @@
+NectarFi x Dominion Market: Structured Yield Engine
+    ✔ Initializes the Dominion Market successfully (412ms)
+    ✔ Rejects Senior deposit if Junior First-Loss Buffer ratio is violated (184ms)
+    ✔ Deposits first-loss capital into Junior Tranche (328ms)
+    ✔ Deposits fixed-income capital into Senior Tranche within safe buffer (310ms)
+    ✔ Executes Waterfall Settlement crank after yield accumulation (6420ms)
+    ✔ Allows Senior user to redeem principal + fixed interest yield (298ms)
+
+  6 passing (8.2s)

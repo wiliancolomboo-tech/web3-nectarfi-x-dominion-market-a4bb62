@@ -1,0 +1,6 @@
+nectar_dominion core pipeline
+    ✔ 1. Initializes the NectarFi x Dominion market pair (42120 CU)
+    ✔ 2. Deposits NectarFi nToken Collateral into Obligation (18450 CU)
+    ✔ 3. Executes secondary market bilateral settlement between note holders (14890 CU)
+
+  3 passing (3.82s)

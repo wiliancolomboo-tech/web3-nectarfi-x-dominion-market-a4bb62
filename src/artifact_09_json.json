@@ -1,0 +1,21 @@
+{
+  "name": "nectar-dominion-vault",
+  "version": "1.0.0",
+  "description": "NectarFi algorithmic vault for Dominion prediction markets",
+  "scripts": {
+    "test": "anchor test"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.0",
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.0"
+  },
+  "devDependencies": {
+    "@types/chai": "^4.3.11",
+    "@types/mocha": "^10.0.6",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^5.3.3"
+  }
+}

@@ -1,0 +1,20 @@
++-------------------------------------------------------------------------------------------------------+
+|                                    SECURITY DEFENSE MATRIX                                            |
++--------------------------+---------------------------------+------------------------------------------+
+| Threat Vector            | Vulnerability Profile           | Implemented Mitigations                 |
++--------------------------+---------------------------------+------------------------------------------+
+| Flash-Loan Arbitrage     | Atomic price manipulation of    | Pure deterministic decay curve derived   |
+| & Oracle Manipulation    | market reserves via borrowed    | from on-chain `Clock` and invariant      |
+|                          | collateral.                     | reserves; rejects external spot oracles. |
++--------------------------+---------------------------------+------------------------------------------+
+| PDA Seed Impersonation   | Malicious actor creates mock    | Canonical seed derivations strictly      |
+|                          | vault and drains market funds.  | tied to `deposit_mint` and `vault_bump`. |
+|                          |                                 | Escrows enforce PDA ownership via types. |
++--------------------------+---------------------------------+------------------------------------------+
+| Reentrancy & Cross-CPI   | Reentering vault during SPL CPI | Checks-Effects-Interactions pattern;     |
+| State Pollution          | transfer callbacks.             | internal balances mutated before or      |
+|                          |                                 | along with non-reentrant Anchor program. |
++--------------------------+---------------------------------+------------------------------------------+
+| Stale Maturity Front-Run | Users redeeming senior tranches | Explicit `is_matured` boolean gate       |
+|                          | before maturity date.           | verified against Sysvar Clock.           |
++--------------------------+---------------------------------+------------------------------------------+

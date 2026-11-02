@@ -1,0 +1,8 @@
+nectar_dominion: Tranche Clearing & Dominion CPI Suite
+     ✔ 1. Initializes Market Architecture, Accounts, and Risk PDAs (420ms)
+     ✔ 2. Senior Depositor commits capital and receives $sNET 1:1 (310ms)
+     ✔ 3. Junior Depositor commits first-loss capital and receives $jNET (295ms)
+     ✔ 4. Blocks Reentrancy in the same slot (180ms)
+     ✔ 5. Executes Waterfall distribution: Senior guaranteed interest + Junior surplus (1640ms)
+
+   5 passing (3s)

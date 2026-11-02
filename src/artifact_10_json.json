@@ -1,0 +1,23 @@
+{
+  "name": "nectar-dominion",
+  "version": "1.0.0",
+  "description": "NectarFi x Dominion Market Yield-Collateralized Clearinghouse",
+  "scripts": {
+    "test": "anchor test"
+  },
+  "dependencies": {
+    "@coral-xyz/anchor": "^0.30.0",
+    "@solana/spl-token": "^0.4.8",
+    "@solana/web3.js": "^1.95.0",
+    "bn.js": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/bn.js": "^5.1.5",
+    "@types/chai": "^4.3.16",
+    "@types/mocha": "^10.0.6",
+    "chai": "^4.3.4",
+    "mocha": "^10.4.0",
+    "ts-mocha": "^10.0.0",
+    "typescript": "^5.4.5"
+  }
+}

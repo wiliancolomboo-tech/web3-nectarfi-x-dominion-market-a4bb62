@@ -1,0 +1,53 @@
+flowchart TD
+    subgraph UsersAndKeepers["User & Automation Layer"]
+        User["User / DAO Treasury"]
+        Keeper["Crank Keeper / Gelato / Switchboard Cron"]
+        Oracle["Resolution Authority / Oracle"]
+    end
+
+    subgraph NectarDominionProgram["NectarFi x Dominion Program (On-Chain Core)"]
+        ConfigPDA["Config PDA<br/>['config']"]
+        UserVaultPDA["User Vault PDA<br/>['user_vault', UserKey, MarketKey]"]
+        MarketPDA["Dominion Market PDA<br/>['market', MarketId]"]
+        YieldCollectorPDA["Yield Collector PDA<br/>['yield_collector', MarketId]"]
+        EscrowVaultPDA["Principal Escrow PDA<br/>['principal_escrow', MarketId]"]
+        YesOutcomeMint["Dominion YES Token Mint<br/>['mint_yes', MarketId]"]
+        NoOutcomeMint["Dominion NO Token Mint<br/>['mint_no', MarketId]"]
+    end
+
+    subgraph ExternalIntegrations["External Protocols"]
+        NectarFi["NectarFi Lending / Yield Protocol"]
+        TokenProgram["SPL Token Program / Token-2022"]
+    end
+
+    %% Deposits & Principal
+    User -- "1. Deposit Base Asset (e.g., USDC)" --> EscrowVaultPDA
+    EscrowVaultPDA -- "2. Deploy Principal to Yield Stream" --> NectarFi
+    NectarFi -- "3. Return Yield Stream / nTokens" --> EscrowVaultPDA
+    User --> UserVaultPDA
+
+    %% Yield Crank & Dominion Allocation
+    Keeper -- "4. Trigger Crank: harvest_yield_and_divert()" --> MarketPDA
+    EscrowVaultPDA -- "5. Sweep Accrued Yield" --> YieldCollectorPDA
+    YieldCollectorPDA -- "6. Mint YES & NO Outcome Pairs" --> YesOutcomeMint
+    YieldCollectorPDA --> NoOutcomeMint
+
+    %% Speculation & Allocation
+    User -- "7. Allocate Streamed Yield to Stance (YES/NO)" --> MarketPDA
+    MarketPDA -- "8. Issue Outcome Tokens to User" --> User
+
+    %% Resolution & Settlement
+    Oracle -- "9. Resolve Market Outcome (YES won / NO won)" --> MarketPDA
+    User -- "10. Redeem Winnings (Claim Escrow Yield Prize)" --> MarketPDA
+    MarketPDA -- "11. Transfer Yield Payout" --> User
+    User -- "12. Withdraw 100% Untouched Principal" --> EscrowVaultPDA
+    EscrowVaultPDA -- "13. Return Base USDC" --> User
+
+    %% Styling
+    classDef pda fill:#1A1E24,stroke:#00FFA3,stroke-width:2px,color:#FFFFFF;
+    classDef ext fill:#111625,stroke:#00B8FF,stroke-width:2px,color:#FFFFFF;
+    classDef actor fill:#221B2A,stroke:#FF007A,stroke-width:2px,color:#FFFFFF;
+
+    class ConfigPDA,UserVaultPDA,MarketPDA,YieldCollectorPDA,EscrowVaultPDA,YesOutcomeMint,NoOutcomeMint pda;
+    class NectarFi,TokenProgram ext;
+    class User,Keeper,Oracle actor;

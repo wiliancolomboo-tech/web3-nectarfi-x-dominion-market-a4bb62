@@ -1,0 +1,9 @@
+nectar_dominion structured yield engine
+    ✔ 1. Successfully initializes Dominion pool with NectarFi tranche state (142ms)
+    ✔ 2. Senior tranche deposit executes at par value (88ms)
+    ✔ 3. Junior tranche deposit provides subordinated first-loss capital (91ms)
+    ✔ 4. Borrower draws liquidity within acceptable utilization boundaries (84ms)
+    ✔ 5. Rejects borrow attempts that breach the 95% utilization cap (39ms)
+    ✔ 6. Accrues continuous interest and cascades yields through the waterfall (2051ms)
+
+  6 passing (3.8s)

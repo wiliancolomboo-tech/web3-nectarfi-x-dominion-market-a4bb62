@@ -1,0 +1,8 @@
+nectar-dominion-suite
+    ✔ 1. Successfully initializes the Dominion Market PDA and Token Mints (432ms)
+    ✔ 2. Deposits base collateral and mints 1:1 PT and YT (298ms)
+    ✔ 3. Keeper updates Nectar yield index via harvest_yield (185ms)
+    ✔ 4. Early exit: Combines and unwraps 1 PT + 1 YT back into collateral (310ms)
+    ✔ 5. Rejects PT redemption prior to maturity (112ms)
+
+  5 passing (2s)

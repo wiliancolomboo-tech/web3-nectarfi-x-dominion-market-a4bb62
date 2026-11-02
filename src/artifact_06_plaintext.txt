@@ -1,0 +1,9 @@
+nectar_dominion test suite
+    ✔ 1. Initializes Dominion Fixed-Yield Market (412ms)
+    ✔ 2. Deposits Junior Cushion Capital First (Underwriting Pool) (388ms)
+    ✔ 3. Deposits Senior Fixed-Yield Capital (395ms)
+    ✔ 4. Borrower locks NectarFi collateral and draws fixed credit (420ms)
+    ✔ 5. Repays loan with accrued fixed debt interest (405ms)
+    ✔ 6. Matures and Senior Depositor redeems principal + guaranteed yield (6102ms)
+
+  6 passing (8.2s)

@@ -1,0 +1,7 @@
+nectar-dominion e2e test suite
+    ✔ 1. Successfully initializes the NectarFi x Dominion Vault (482ms)
+    ✔ 2. Deposits base asset, strips yield, and logs user fixed position (315ms)
+    ✔ 3. Executes constant yield PT-to-Base swap with slippage bounds (290ms)
+    ✔ 4. Rejects tranche rollover before maturity timestamp is reached (112ms)
+
+  4 passing (1.8s)

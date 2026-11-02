@@ -1,0 +1,1 @@
+Risk Invariant: Principal_Base(t_end) == Principal_Base(t_0)
