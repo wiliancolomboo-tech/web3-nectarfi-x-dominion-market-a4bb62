@@ -10,7 +10,7 @@ dotenv.config();
 
 // Configuration
 const RPC_ENDPOINT = process.env.SOLANA_RPC_URL || clusterApiUrl("devnet");
-const RESEND_API_KEY = process.env.RESEND_API_KEY || "re_test_dummy_key";
+const RESEND_API_KEY = process.env.RESEND_API_KEY || "re_test_000000000000000000000000";
 const DISCORD_WEBHOOK_URL = process.env.DISCORD_WEBHOOK_URL || "";
 const KEYPAIR_PATH = process.env.KEYPAIR_PATH || "./keeper-keypair.json";
 const PROGRAM_ID = new PublicKey("DNYE111111111111111111111111111111111111111");

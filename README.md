@@ -1285,7 +1285,7 @@ services:
       - PROGRAM_ID=NectDominionMarketVault1111111111111111111111
       - OPERATOR_PRIVATE_KEY=[1,2,3...255]
       - SLACK_WEBHOOK_URL=https://api.example.com/webhooks/alerts/placeholder
-      - RESEND_API_KEY=re_enterprise_live_key
+      - RESEND_API_KEY=re_test_000000000000000000000000
       - ALERT_EMAIL_TO=core-dev@nectar.fi
       - PORT=8080
     ports:
